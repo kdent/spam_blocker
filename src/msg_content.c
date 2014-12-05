@@ -99,7 +99,8 @@ msg_set_from(MsgContent *msg, char *from)
 void
 chomp(char *str)
 {
-    for (int i = strlen(str) - 1; i > 0; i++) {
+    int i;
+    for (i = strlen(str) - 1; i > 0; i++) {
         if (str[i] == '\n' || str[i] == '\r')
             str[i] = '\0';
         else

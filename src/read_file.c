@@ -20,7 +20,7 @@ DocAnalysis *
 read_file(char *file_name)
 {
 
-    char *combined_headers;
+    char *combined_headers, *str;
     FILE *in;
     MsgContent *msg;
     DocAnalysis *doc;
@@ -36,7 +36,7 @@ read_file(char *file_name)
     fclose(in);
 
     printf("%s: ", doc->label);
-    for (char *str = str_list_first(doc->token_list); str != NULL;
+    for (str = str_list_first(doc->token_list); str != NULL;
     str = str_list_next(doc->token_list))
     {
         printf("[%s] ", str);

@@ -14,13 +14,13 @@ char **
 word_list(VocabList *vlist)
 {
     char **wlist;
-    int j = 0;
+    int i, j = 0;
 
     wlist = (char **)malloc(sizeof(char *) * vlist->item_count); 
     if (wlist == NULL) return NULL;
     memset(wlist, 0, sizeof(char *) * vlist->item_count);
 
-    for (int i = 0; i < vlist->tbl_size; i++) {
+    for (i = 0; i < vlist->tbl_size; i++) {
         VocabItem *item = NULL;
         if ((item = vlist->table[i]) != NULL) {
             while (item != NULL) {
@@ -39,7 +39,8 @@ word_list(VocabList *vlist)
 void
 word_list_free(int wlist_size, char **wlist)
 {
-    for (int i = 0; i < wlist_size; i++) {
+    int i;
+    for (i = 0; i < wlist_size; i++) {
         free(wlist[i]);
     }
     free(wlist);
@@ -50,6 +51,7 @@ vocab_list(DocList *doc_list)
 {
     VocabList *vlist = NULL;
     DocAnalysis *doc = NULL;
+    char *str = NULL;
 
     if (doc_list == NULL) return NULL;
 
@@ -59,7 +61,8 @@ vocab_list(DocList *doc_list)
 
     for (doc = doc_list_first(doc_list); doc != NULL; doc = doc_list_next(doc_list))
     {
-        for (char *str = str_list_first(doc->token_list); str != NULL; str = str_list_next(doc->token_list))
+        for (str = str_list_first(doc->token_list); str != NULL;
+        str = str_list_next(doc->token_list))
         {
             if (vocab_list_insert(vlist, str) != 0) return NULL;
         }
@@ -70,7 +73,8 @@ vocab_list(DocList *doc_list)
 void
 vocab_list_free(VocabList *vlist)
 {
-    for (int i = 0; i < vlist->tbl_size; i++) {
+    int i;
+    for (i = 0; i < vlist->tbl_size; i++) {
         if (vlist->table[i] != NULL) {
             VocabItem *item, *next;
             item = vlist->table[i];
@@ -89,12 +93,13 @@ vocab_list_free(VocabList *vlist)
 int
 vocab_list_init(VocabList *vlist)
 {
+    int i;
     vlist->tbl_size = TBLSIZE;
     vlist->slot_count = 0;
     vlist->item_count = 0;
     vlist->table = (VocabItem **)malloc(sizeof(VocabItem) * TBLSIZE);
     if (vlist->table == NULL) return -1;
-    for (int i = 0; i < vlist->tbl_size; i++) {
+    for (i = 0; i < vlist->tbl_size; i++) {
         vlist->table[i] = NULL;
     }
     return 0;

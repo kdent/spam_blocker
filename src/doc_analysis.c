@@ -28,7 +28,7 @@ typedef enum {
     DIGIT,
     LEFT_ABRACKET,
     RIGHT_ABRACKET,
-    NON_LETTER,
+    NON_LETTER
 } Alphabet;
 
 /* State Transition Table 
@@ -67,6 +67,7 @@ analyze_doc(char *label, char *doc)
     DocAnalysis *doc_features;
     struct token_buf *buf = (struct token_buf *)malloc(sizeof(struct token_buf));
     char *c = (char *)malloc(sizeof(char));
+    int i;
 
     if (doc == NULL) doc = "";
     if (label == NULL) label = "";
@@ -90,7 +91,7 @@ analyze_doc(char *label, char *doc)
         return NULL;
 
     /* */
-    for (int i = 0; i < strlen(doc); i++) {
+    for (i = 0; i < strlen(doc); i++) {
         *c = doc[i];
         current_symbol = get_symbol(doc_features, current_state, c);
         current_state = state_transition(doc_features, buf, current_symbol, current_state, c);

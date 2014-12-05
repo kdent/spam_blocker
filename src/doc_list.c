@@ -15,11 +15,12 @@
 DocList *
 doc_list(int filec, char **file_list)
 {
+    int i;
     DocList *doc_list = NULL;
     DocAnalysis *doc_analysis = NULL;
 
     doc_list = doc_list_init();
-    for (int i = 0; i < filec; i++) {
+    for (i = 0; i < filec; i++) {
         doc_analysis = read_file(file_list[i]);
         if (doc_analysis == NULL) return NULL;
         if (doc_list_add(doc_list, doc_analysis) != 0) {
@@ -77,7 +78,8 @@ doc_list_next(DocList *dlist)
 void
 doc_list_free(DocList *dlist)
 {
-    for (int i = 0; i < dlist->cur_size; i++) {
+    int i;
+    for (i = 0; i < dlist->cur_size; i++) {
         doc_analysis_free(dlist->list[i]);
     }
     free(dlist->list);
