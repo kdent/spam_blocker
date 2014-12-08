@@ -7,27 +7,31 @@
 
 /*
  * The doc_list() function calls read_file() for each file given in
- * file_list. The parameter filec is the number of files in file_list.
+ * file_list.
  *
  * Returns the generated list or NULL if it encounters any errors. If an error
  * occurs errno will be set by the system call that originated it.
  */
 DocList *
-doc_list(int filec, char **file_list)
+doc_list(str_list *file_list)
 {
-    int i;
-    DocList *doc_list = NULL;
+    DocList *dlist = NULL;
     DocAnalysis *doc_analysis = NULL;
+    char *filename;
 
-    doc_list = doc_list_init();
-    for (i = 0; i < filec; i++) {
-        doc_analysis = read_file(file_list[i]);
+    dlist = doc_list_init();
+    for (filename = str_list_first(file_list); filename != NULL;
+    filename = str_list_next(file_list))
+    {
+        doc_analysis = read_file(filename);
         if (doc_analysis == NULL) return NULL;
-        if (doc_list_add(doc_list, doc_analysis) != 0) {
+/* TODO: add document class label here. */
+/* doc_analysis->class = SPAM e.g. */
+        if (doc_list_add(dlist, doc_analysis) != 0) {
             return NULL;
         }
     }
-    return doc_list;
+    return dlist;
 }
 
 DocList *
@@ -38,8 +42,8 @@ doc_list_init()
     dlist->max_size = DOC_LIST_SIZE;
     dlist->cur_size = 0;
     dlist->cur_item = 0;
-    dlist->list = (DocAnalysis **)malloc(sizeof(DocAnalysis) * dlist->max_size);
-    memset(dlist->list, 0, sizeof(DocAnalysis) * dlist->max_size);
+    dlist->list = (DocAnalysis **)malloc(sizeof(DocAnalysis *) * dlist->max_size);
+    memset(dlist->list, 0, sizeof(DocAnalysis *) * dlist->max_size);
     return dlist;
 }
 
@@ -48,7 +52,7 @@ doc_list_add(DocList *dlist, DocAnalysis *doc)
 {
 
     if (dlist->cur_size >= dlist->max_size) {
-        DocAnalysis **new_list = realloc(dlist->list, dlist->max_size * 2);
+        DocAnalysis **new_list = realloc(dlist->list, (sizeof(DocAnalysis *) * dlist->max_size) * 2);
         if (new_list == NULL)
             return -1;
 
@@ -76,11 +80,13 @@ doc_list_next(DocList *dlist)
 }
 
 void
-doc_list_free(DocList *dlist)
+doc_list_free(DocList *dlist, int free_docs)
 {
-    int i;
-    for (i = 0; i < dlist->cur_size; i++) {
-        doc_analysis_free(dlist->list[i]);
+    if (free_docs) {
+        int i;
+        for (i = 0; i < dlist->cur_size; i++) {
+            doc_analysis_free(dlist->list[i]);
+        }
     }
     free(dlist->list);
     free(dlist);

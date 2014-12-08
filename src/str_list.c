@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 #include <str_list.h>
@@ -124,6 +125,9 @@ str_list_first(str_list *list)
 {
     if (list == NULL)
         return NULL;
+    if (list->first_item == NULL) {
+        return NULL;
+    }
 
     list->cur_item = list->first_item;
     if (list->cur_item != NULL)

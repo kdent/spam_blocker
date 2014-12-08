@@ -7,11 +7,11 @@ int
 main(int argc, char **argv)
 {
     DocList *dlist = NULL;
-    struct doc_analysis doc1;
-    struct doc_analysis doc2;
-    struct doc_analysis doc3;
-    struct doc_analysis doc4;
-    struct doc_analysis *retrieved = NULL;
+    DocAnalysis doc1;
+    DocAnalysis doc2;
+    DocAnalysis doc3;
+    DocAnalysis doc4;
+    DocAnalysis *retrieved = NULL;
 
     doc1.label = "spam 1";
     doc1.class = 1;
@@ -33,6 +33,6 @@ main(int argc, char **argv)
         printf("doc: %s class: %d\n", retrieved->label, retrieved->class);
     }
 
-    doc_list_free(dlist);
+    doc_list_free(dlist, 0);
 
 }
