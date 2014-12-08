@@ -27,4 +27,4 @@ test_doc_list: $(OBJS) $(DEPS) test/test_doc_list.c
 	$(CC) -o $@ $(CFLAGS) $(OBJS) test/$(@).c
 
 clean:
-	rm -rf $(OBJS) spam_blocker test_* *.dSYM
+	rm -rf $(OBJS) spam_blocker src/spam_blocker.o test_* *.dSYM
