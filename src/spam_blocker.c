@@ -1,3 +1,8 @@
+/*
+ * When training Looks for directories called spam_samples and email_samples
+ * for the data directory given on the command line.
+ *
+ */
 #include <dirent.h>
 #include <errno.h>
 #include <libgen.h>
@@ -6,6 +11,7 @@
 #include <string.h>
 
 #include <doc_list.h>
+#include <vocab_list.h>
 
 #define PROG_NAME "spam_blocker"
 #define SPAM_SUBDIR "spam_samples"
@@ -17,12 +23,15 @@ DocList *load_training_docs(char *dirname);
 str_list *get_file_names(char *dirname);
 char *alloc_buf(int sz);
 
+enum {SPAM, EMAIL};
+char *CLASS_LABEL[] = { "spam", "email" };
 
 int
 main(int argc, char **argv)
 {
     char *dirname;
-    DocList *dlist = NULL;
+    DocList *doc_features_list = NULL;
+    VocabList *vocab_list = NULL;
 
     /* Assume training only until other features are added. */
     if (argc != 2) {
@@ -30,29 +39,36 @@ main(int argc, char **argv)
         exit(1);
     }
 
+    /* Load the training files into a list of document features. */
     dirname = argv[1];
-    dlist = load_training_docs(dirname);
-    if (dlist == NULL) {
+    doc_features_list = load_training_docs(dirname);
+    if (doc_features_list == NULL || doc_features_list->cur_size == 0) {
         fprintf(stderr, "%s: no training files found or unable to read files in directory: %s\n",
             PROG_NAME, dirname);
         exit(1);
     }
 
+    /* Create a vocabulary list from all the words in the corpus. */
+    vocab_list = vocab_list_from_docs(doc_features_list);
+
 {
-DocAnalysis *doc = NULL;
-printf("got %d documents\n", dlist->cur_size);
-for (doc = doc_list_first(dlist); doc != NULL; doc = doc_list_next(dlist)) {
-    printf("%s: ", doc->label);
-    for (char *str = str_list_first(doc->token_list); str != NULL;
-    str = str_list_next(doc->token_list))
-    {
-        printf("[%s] ", str);
-    }
-    printf("\n");
+char **words;
+char *word;
+int i;
+words = word_list(vocab_list);
+i = 0;
+word = words[i];
+while (word != NULL) {
+    VocabItem *tok = vocab_list_lookup(vocab_list, word);
+    printf("%s\t%d\n", word, tok->count);
+    word = words[++i];
 }
 }
 
+    doc_list_free(doc_features_list, FREE_DOCS);
+    vocab_list_free(vocab_list);
 
+    return 0;
 }
 
 DocList *
@@ -60,8 +76,9 @@ load_training_docs(char *dirname)
 {
     DIR *dh;
     struct dirent *dir_entry;
-    str_list *spam_files = NULL, *email_files;
-    DocList *dlist = NULL;
+    str_list *spam_files, *email_files;
+    DocList *spam_dlist, *dlist;
+    DocFeatures *doc_index;
     char *buf;
 
     /* Allocate memory for various things. */
@@ -71,7 +88,9 @@ load_training_docs(char *dirname)
         exit(-1);
     }
 
-    /* Read through the directory for spam and email training files. */
+    /*
+     * Read through the directory looking for spam and email training files.
+     */
     dh = opendir(dirname);
     if (dh == NULL) {
         fprintf(stderr, "%s: cannot read %s: %s\n", PROG_NAME, dirname,
@@ -84,12 +103,24 @@ load_training_docs(char *dirname)
         sprintf(buf, "%s%s%s", dirname, PATH_SEP, dir_entry->d_name);
         if (strcmp(basename(buf), SPAM_SUBDIR) == 0) {
             spam_files = get_file_names(buf);
+        } else if (strcmp(basename(buf), EMAIL_SUBDIR) == 0) {
+            email_files = get_file_names(buf);
         }
     }
     closedir(dh);
 
-    dlist = doc_list(spam_files);
-
+    /*
+     * Combine spam document features and email document features into a
+     * a single document list.
+     */
+    spam_dlist = doc_list_from_files(SPAM, spam_files);
+    dlist = doc_list_from_files(EMAIL, email_files);
+    for (doc_index = doc_list_first(spam_dlist); doc_index != NULL;
+    doc_index = doc_list_next(spam_dlist))
+    {
+        doc_list_add(dlist, doc_index);
+    }
+ 
     return dlist;
 }
 

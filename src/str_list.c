@@ -177,3 +177,16 @@ str_list_size(str_list *list)
     return list->n_items;
 }
 
+/*
+ * Combines two lists into one. The original second list is no longer
+ * accessible after being appended onto the fisrt list.
+ */
+str_list *
+str_list_append(str_list *list1, str_list *list2)
+{
+    list1->last_item->next = list2->first_item;
+    list1->n_items += list2->n_items;
+    free(list2);
+    return list1;
+}
+

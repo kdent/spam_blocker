@@ -2,28 +2,28 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <doc_analysis.h>
+#include <doc_features.h>
 #include <msg_content.h>
 #include <str_list.h>
 
 /*
  * The read_file() function is used to extract the document features from a
  * given file. The file is assumed to be an rfc2822 formatted message file.
- * The function invokes the analyze_doc() function to get a DocAnalysis
+ * The function invokes the analyze_doc() function to get a DocFeatures
  * structure from the file.
  *
- * Returns a DocAnalysis structure. An error can occur if the file cannot be
+ * Returns a DocFeatures structure. An error can occur if the file cannot be
  * opened for reading or if memory cannot be allocated. If an error occurs, it
  * returns NULL and either error will set errno.
  */
-DocAnalysis *
+DocFeatures *
 read_file(char *file_name)
 {
 
     char *combined_headers;
     FILE *in;
     MsgContent *msg;
-    DocAnalysis *doc;
+    DocFeatures *doc;
 
     in = fopen(file_name, "r");
     if (in == NULL) return NULL;

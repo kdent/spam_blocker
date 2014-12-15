@@ -7,11 +7,11 @@ int
 main(int argc, char **argv)
 {
     DocList *dlist = NULL;
-    DocAnalysis doc1;
-    DocAnalysis doc2;
-    DocAnalysis doc3;
-    DocAnalysis doc4;
-    DocAnalysis *retrieved = NULL;
+    DocFeatures doc1;
+    DocFeatures doc2;
+    DocFeatures doc3;
+    DocFeatures doc4;
+    DocFeatures *retrieved = NULL;
 
     doc1.label = "spam 1";
     doc1.class = 1;
