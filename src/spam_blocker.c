@@ -58,11 +58,14 @@ int i;
 words = word_list(vocab_list);
 i = 0;
 word = words[i];
+/*
 while (word != NULL) {
     VocabItem *tok = vocab_list_lookup(vocab_list, word);
     printf("%s\t%d\n", word, tok->count);
     word = words[++i];
 }
+*/
+word_list_free(i, words);
 }
 
     doc_list_free(doc_features_list, FREE_DOCS);
@@ -81,13 +84,6 @@ load_training_docs(char *dirname)
     DocFeatures *doc_index;
     char *buf;
 
-    /* Allocate memory for various things. */
-    dir_entry = (struct dirent *)malloc(sizeof(struct dirent));
-    if (dir_entry == NULL) {
-        fprintf(stderr, "%s: error allocating memory, quiting.\n", PROG_NAME);
-        exit(-1);
-    }
-
     /*
      * Read through the directory looking for spam and email training files.
      */
@@ -101,11 +97,12 @@ load_training_docs(char *dirname)
     while ((dir_entry = readdir(dh)) != NULL) {
         buf = alloc_buf(strlen(dirname) + strlen(PATH_SEP) + strlen(dir_entry->d_name) + 1);
         sprintf(buf, "%s%s%s", dirname, PATH_SEP, dir_entry->d_name);
-        if (strcmp(basename(buf), SPAM_SUBDIR) == 0) {
+        if (strcmp(dir_entry->d_name, SPAM_SUBDIR) == 0) {
             spam_files = get_file_names(buf);
-        } else if (strcmp(basename(buf), EMAIL_SUBDIR) == 0) {
+        } else if (strcmp(dir_entry->d_name, EMAIL_SUBDIR) == 0) {
             email_files = get_file_names(buf);
         }
+        free(buf);
     }
     closedir(dh);
 
@@ -120,6 +117,10 @@ load_training_docs(char *dirname)
     {
         doc_list_add(dlist, doc_index);
     }
+
+    str_list_free(email_files);
+    str_list_free(spam_files);
+    doc_list_free(spam_dlist, DONT_FREE_DOCS);
  
     return dlist;
 }
@@ -132,7 +133,6 @@ get_file_names(char *dirname)
     str_list *list;
     char *buf;
 
-    file_entry = (struct dirent *)malloc(sizeof(struct dirent));
     list = str_list_init();
 
     dh = opendir(dirname);
@@ -142,6 +142,7 @@ get_file_names(char *dirname)
         buf = alloc_buf(strlen(dirname) + strlen(PATH_SEP) + strlen(file_entry->d_name) + 1);
         sprintf(buf, "%s%s%s", dirname, PATH_SEP, file_entry->d_name);
         str_list_add(list, buf);
+        free(buf);
     }
     closedir(dh);
     free(file_entry);

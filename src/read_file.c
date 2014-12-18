@@ -31,11 +31,12 @@ read_file(char *file_name)
     msg = msg_content(in);
     combined_headers = (char *)malloc(strlen(msg->subject) + strlen(msg->from_hdr) + 2);
     if (combined_headers == NULL) return NULL;
-    combined_headers = strcat(msg->subject, msg->from_hdr);
+    sprintf(combined_headers, "%s %s", msg->subject, msg->from_hdr);
     doc = analyze_doc(file_name, combined_headers);
     fclose(in);
 
     free(combined_headers);
+    msg_free(msg);
 
     return doc;
 }

@@ -162,9 +162,11 @@ vocab_item_init(char *word, int cur_index)
 {
     VocabItem *item = (VocabItem *)malloc(sizeof(VocabItem));
     if (item == NULL) return NULL;
-    item->word = (char *)malloc(strlen(word) + 1);
-    if (item->word == NULL) return NULL;
-    strcpy(item->word, word);
+    if (word != NULL) {
+        item->word = (char *)malloc(strlen(word) + 1);
+        if (item->word == NULL) return NULL;
+        strcpy(item->word, word);
+    }
     item->count = 1;
     item->index = cur_index;
     item->next = NULL;
