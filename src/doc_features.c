@@ -43,17 +43,16 @@ int transition_tbl[6][5] = {
 };
 
 struct token_buf {
-    char *cur_token;
-    int size;
+    char cur_token[MSG_HDR_LEN];
     int end_ptr;
 };
 
 /* Internal function prototypes */
-State    state_transition(DocFeatures *doc_features, struct token_buf *buf, Alphabet symbol, State cur_state, char *c);
+State    state_transition(DocFeatures *doc_features, struct token_buf *buf, Alphabet symbol, State cur_state, char c);
 int      push_char(struct token_buf *buf, char c);
 int      make_token(DocFeatures *doc_features, struct token_buf *buf);
-char     *digit_to_char(char *c);
-Alphabet get_symbol(DocFeatures *doc_features, State current_state, char *c);
+char     digit_to_char(char c);
+Alphabet get_symbol(DocFeatures *doc_features, State current_state, char c);
 
 /*
  *
@@ -65,8 +64,8 @@ analyze_doc(char *label, char *doc)
     State current_state = NON_WORD;
     Alphabet current_symbol;
     DocFeatures *doc_features;
-    struct token_buf *buf = (struct token_buf *)malloc(sizeof(struct token_buf));
-    char *c = (char *)malloc(sizeof(char));
+    struct token_buf buf;
+    char c;
     int i;
 
     if (doc == NULL) doc = "";
@@ -84,26 +83,20 @@ analyze_doc(char *label, char *doc)
     doc_features->embedded_digit = 0;
 
     /* Initialize buffer for building tokens. */
-    buf->size = INIT_BUFSIZ;
-    buf->end_ptr = 0;
-    buf->cur_token = (char *)malloc(buf->size);
-    if (buf->cur_token == NULL)
-        return NULL;
+    buf.end_ptr = 0;
+    memset(buf.cur_token, 0, MSG_HDR_LEN);
 
     /* */
     for (i = 0; i < strlen(doc); i++) {
-        *c = doc[i];
+        c = doc[i];
         current_symbol = get_symbol(doc_features, current_state, c);
-        current_state = state_transition(doc_features, buf, current_symbol, current_state, c);
+        current_state = state_transition(doc_features, &buf, current_symbol, current_state, c);
         if (current_state == ERROR)
             return NULL;
     }
     if (current_state == LWORD || current_state == UWORD)
-        make_token(doc_features, buf);
+        make_token(doc_features, &buf);
 
-    free(c);
-    free(buf->cur_token);
-    free(buf);
     return doc_features;
 }
 
@@ -117,7 +110,7 @@ doc_analysis_free(DocFeatures *doc)
 
 State
 state_transition(DocFeatures *doc_features, struct token_buf *buf,
-Alphabet symbol, State cur_state, char *c)
+Alphabet symbol, State cur_state, char c)
 {
     /* Get the next state. */
     State next_state = transition_tbl[symbol][cur_state];
@@ -126,23 +119,23 @@ Alphabet symbol, State cur_state, char *c)
     switch (cur_state) {
         case NON_WORD:
             if (symbol ==  LOWER) {
-                if (push_char(buf, *c) != 0)
+                if (push_char(buf, c) != 0)
                     next_state = ERROR;
             } else if (symbol == UPPER) {
-                if (push_char(buf, tolower(*c)) != 0)
+                if (push_char(buf, tolower(c)) != 0)
                     next_state = ERROR;
             }
             break;
 
         case LWORD:
             if (symbol == LOWER) {
-                if (push_char(buf, *c) != 0)
+                if (push_char(buf, c) != 0)
                     next_state = ERROR;
             } else if (symbol == UPPER) {
                 if (make_token(doc_features, buf) != 0)
                     next_state = ERROR;
                 doc_features->camel_case = 1;
-                if (push_char(buf, tolower(*c)) != 0)
+                if (push_char(buf, tolower(c)) != 0)
                     next_state = ERROR;
             } else if (symbol == DIGIT || symbol == NON_LETTER) {
                 if (make_token(doc_features, buf) != 0)
@@ -152,10 +145,10 @@ Alphabet symbol, State cur_state, char *c)
 
         case UWORD:
             if (symbol == LOWER) {
-                if (push_char(buf, *c) != 0)
+                if (push_char(buf, c) != 0)
                     next_state = ERROR;
             } else if (symbol == UPPER) {
-                if (push_char(buf, tolower(*c)) != 0)
+                if (push_char(buf, tolower(c)) != 0)
                     next_state = ERROR;
             } else if (symbol == DIGIT || symbol == NON_LETTER) {
                 if (make_token(doc_features, buf) != 0)
@@ -176,15 +169,9 @@ Alphabet symbol, State cur_state, char *c)
 int
 push_char(struct token_buf *buf, char c)
 {
-    if (buf->end_ptr >= buf->size) {
-       char *tmp_buf;
-       buf->size *= 2;
-       tmp_buf = (char *)realloc(buf->cur_token, buf->size);
-        if (tmp_buf == NULL)
-            return -1;
-        buf->cur_token = tmp_buf;
+    if (buf->end_ptr < MSG_HDR_LEN) {
+        buf->cur_token[buf->end_ptr++] = c;
     }
-    buf->cur_token[buf->end_ptr++] = c;
     return 0;
 }
 
@@ -200,36 +187,36 @@ make_token(DocFeatures *doc_features, struct token_buf *buf)
         return -1;
     free(token);
     buf->end_ptr = 0;
-    memset(buf->cur_token, 0, buf->size);
+    memset(buf->cur_token, 0, MSG_HDR_LEN);
     return 0;
 }
 
-char *
-digit_to_char(char *c)
+char
+digit_to_char(char c)
 {
-    if (*c == '0') {
-        *c = 'o';
-    } else if (*c == '1')
-        *c = 'l';
+    if (c == '0') {
+        c = 'o';
+    } else if (c == '1')
+        c = 'l';
 
     return c;
 }
 
 Alphabet
-get_symbol(DocFeatures *doc_features, State current_state, char *c)
+get_symbol(DocFeatures *doc_features, State current_state, char c)
 {
     Alphabet cur_symbol;
 
-    if (islower(*c))
+    if (islower(c))
         cur_symbol = LOWER;
-    else if (isupper(*c))
+    else if (isupper(c))
         cur_symbol = UPPER;
-    else if (isdigit(*c)) {
+    else if (isdigit(c)) {
         if (current_state == LWORD || current_state == UWORD) {
             digit_to_char(c);
-            if (isalpha(*c)) {
+            if (isalpha(c)) {
                 if (current_state == UWORD) {
-                    *c = toupper(*c);
+                    c = toupper(c);
                     cur_symbol = UPPER;
                 } else {
                     cur_symbol = LOWER;
@@ -241,17 +228,17 @@ get_symbol(DocFeatures *doc_features, State current_state, char *c)
         } else {
             cur_symbol = DIGIT;
         }
-    } else if (*c == '<')
+    } else if (c == '<')
         cur_symbol = LEFT_ABRACKET;
-    else if (*c == '>')
+    else if (c == '>')
         cur_symbol = RIGHT_ABRACKET;
-    else if (*c == '$') {
+    else if (c == '$') {
         if (current_state == LWORD || current_state == UWORD) {
             if (current_state == UWORD) {
-                *c = 'S';
+                c = 'S';
                 cur_symbol = UPPER;
             } else {
-                *c = 's';
+                c = 's';
                 cur_symbol = LOWER;
             }
             doc_features->embedded_digit = 1; 

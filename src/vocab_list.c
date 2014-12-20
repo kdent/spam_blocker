@@ -3,6 +3,7 @@
 
 #include <doc_features.h>
 #include <doc_list.h>
+#include <str_list.h>
 #include <vocab_list.h>
 
 #define TBLSIZE 9323
@@ -29,7 +30,15 @@ vocab_list_init(VocabList *vlist)
 }
 
 /*
- * Create a new VocabList from a given DocList.
+ * Create a new VocabList from a given DocList. A VocabList is a list of
+ * VocabItem objects which is managed as a hash table for fast read access.
+ *  In addition to the word other information such as number of occurences is
+ * stored in the VocabItem. The returned VocabList should be freed by calling
+ * vocab_list_free().
+ *
+ * If successful, vocab_list_from_docs() returns a pointer to a VocabList. If
+ * there is an error allocating memory or the doc_list parameter is NULL, it
+ * returns a NULL. In the case of a memory error, errno will be set.
  */
 VocabList *
 vocab_list_from_docs(DocList *doc_list)
@@ -81,44 +90,26 @@ vocab_list_free(VocabList *vlist)
 /*
  * Get the set of words for a given VocabList.
  */
-char **
+str_list *
 word_list(VocabList *vlist)
 {
-    char **wlist;
-    int i, j = 0;
+    str_list *wlist;
+    int i;
 
-    wlist = (char **)malloc(sizeof(char *) * vlist->item_count); 
+    wlist = str_list_init();
     if (wlist == NULL) return NULL;
-    memset(wlist, 0, sizeof(char *) * vlist->item_count);
 
     for (i = 0; i < vlist->tbl_size; i++) {
         VocabItem *item = NULL;
         if ((item = vlist->table[i]) != NULL) {
             while (item != NULL) {
-                wlist[j] = (char *)malloc(strlen(item->word) + 1);
-                if (wlist[j] == NULL) return NULL;
-                strcpy(wlist[j], item->word);
-                j++;
+                str_list_add(wlist, item->word);
                 item = item->next;
             }
         }
     }
 
     return wlist;
-}
-
-/*
- * Free the memory associated with a word list previously obtained from
- * calling word_list().
- */
-void
-word_list_free(int wlist_size, char **wlist)
-{
-    int i;
-    for (i = 0; i < wlist_size; i++) {
-        free(wlist[i]);
-    }
-    free(wlist);
 }
 
 int
@@ -130,8 +121,13 @@ vocab_list_insert(VocabList *vlist, char *word)
     hash = hash_vocab_word(word);
     item = vlist->table[hash];
 
-    /* This bucket might already be in use by this word or another. */
-    if (item != NULL) {
+    /*
+     * When adding to the list, there are three possible situations: 1. the
+     * hash slot is already in use by a different word (hash collision),
+     * 2. the hash slot is already in use by a previous instance of this same
+     * word, or 3. the slot is completely available.
+     */
+    if (item != NULL) {     /* Slot is occupied. */
         item = vocab_list_lookup(vlist, word);
         if (item == NULL) {     /* This word does not exist yet. */
             VocabItem *list_item = vlist->table[hash];
@@ -146,7 +142,7 @@ vocab_list_insert(VocabList *vlist, char *word)
         } else {    /* Same as existing word, increment its count. */
             item->count++;
         }
-    } else {    /* Bucket is completely available. */
+    } else {    /* Slot is completely available. */
         item = vocab_item_init(word, vlist->item_count);
         vlist->item_count++;
         vlist->slot_count++;
@@ -157,6 +153,10 @@ vocab_list_insert(VocabList *vlist, char *word)
     return 0;
 }
 
+/*
+ * Create a new VocabItem structure initializing default values and copying
+ * the supplied word into the structure.
+ */
 VocabItem *
 vocab_item_init(char *word, int cur_index)
 {

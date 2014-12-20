@@ -56,7 +56,7 @@ str_list_add(str_list *list, char *str_val)
     if (list == NULL)     return 0;
     if (new_str == NULL) return 0;
 
-    strncpy(new_str, str_val, strlen(str_val) + 1);
+    strcpy(new_str, str_val);
     return add(list, new_str);
 }
 

@@ -5,10 +5,6 @@
 
 #define DOC_LIST_SIZE 4
 
-typedef enum {
-    FREE_DOCS, DONT_FREE_DOCS
-} DOCS_FREE_FLAG;
-
 typedef struct _doc_list {
     int cur_size;
     int max_size;
@@ -21,6 +17,6 @@ DocList *doc_list_init();
 int doc_list_add(DocList *dlist, DocFeatures *doc);
 DocFeatures *doc_list_first(DocList *dlist);
 DocFeatures *doc_list_next(DocList *dlist);
-void doc_list_free(DocList *dlist, DOCS_FREE_FLAG free_docs);
+void doc_list_free(DocList *dlist);
 
 #endif

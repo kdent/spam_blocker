@@ -58,9 +58,13 @@ doc_list_add(DocList *dlist, DocFeatures *doc)
 {
 
     if (dlist->cur_size >= dlist->max_size) {
-        DocFeatures **new_list = realloc(dlist->list, (sizeof(DocFeatures *) * dlist->max_size) * 2);
+        DocFeatures **new_list = NULL;
+        new_list = realloc(dlist->list, (sizeof(DocFeatures *) * dlist->max_size) * 2);
         if (new_list == NULL)
             return -1;
+
+        /* Zero-fill the new portion of the memory. */
+        memset(new_list + dlist->max_size, 0, dlist->max_size);
 
         dlist->list = new_list;
         dlist->max_size *= 2;
@@ -86,13 +90,11 @@ doc_list_next(DocList *dlist)
 }
 
 void
-doc_list_free(DocList *dlist, DOCS_FREE_FLAG free_docs)
+doc_list_free(DocList *dlist)
 {
-    if (free_docs) {
-        int i;
-        for (i = 0; i < dlist->cur_size; i++) {
-            doc_analysis_free(dlist->list[i]);
-        }
+    int i;
+    for (i = 0; i < dlist->cur_size; i++) {
+        doc_analysis_free(dlist->list[i]);
     }
     free(dlist->list);
     free(dlist);

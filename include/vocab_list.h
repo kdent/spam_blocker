@@ -15,7 +15,7 @@ typedef struct _vocab_list {
     VocabItem **table;
 } VocabList;
 
-char **word_list(VocabList *);
+str_list *word_list(VocabList *);
 void word_list_free(int, char **);
 VocabList *vocab_list_from_docs(DocList *doc_list);
 void vocab_list_free(VocabList *vlist);
