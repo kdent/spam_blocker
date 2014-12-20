@@ -9,8 +9,8 @@
 /*
  * The read_file() function is used to extract the document features from a
  * given file. The file is assumed to be an rfc2822 formatted message file.
- * The function invokes the analyze_doc() function to get a DocFeatures
- * structure from the file.
+ * The function invokes the extract_doc_features() function to get a
+ * DocFeatures structure from the file.
  *
  * Returns a DocFeatures structure. An error can occur if the file cannot be
  * opened for reading or if memory cannot be allocated. If an error occurs, it
@@ -32,7 +32,7 @@ read_file(char *file_name)
     combined_headers = (char *)malloc(strlen(msg->subject) + strlen(msg->from_hdr) + 2);
     if (combined_headers == NULL) return NULL;
     sprintf(combined_headers, "%s %s", msg->subject, msg->from_hdr);
-    doc = analyze_doc(file_name, combined_headers);
+    doc = extract_doc_features(file_name, combined_headers);
     fclose(in);
 
     free(combined_headers);

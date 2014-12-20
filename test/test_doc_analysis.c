@@ -33,9 +33,9 @@ void
 test_str(char *label, char *str) {
     struct doc_analysis *doc_f;
 
-    doc_f = analyze_doc(label, str);
+    doc_f = extract_doc_features(label, str);
     if (doc_f == NULL) {
-        printf("ERROR: analyzie_doc() returned an error\n");
+        printf("ERROR: extract_doc_features() returned an error\n");
     } else {
         print_tokens(doc_f->label, doc_f->token_list);
     }

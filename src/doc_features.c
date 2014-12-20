@@ -59,7 +59,7 @@ Alphabet get_symbol(DocFeatures *doc_features, State current_state, char c);
  * Returns a doc_features structure or NULL if there are memory errors.
  */
 DocFeatures *
-analyze_doc(char *label, char *doc)
+extract_doc_features(char *label, char *doc)
 {
     State current_state = NON_WORD;
     Alphabet current_symbol;

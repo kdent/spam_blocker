@@ -12,7 +12,7 @@ typedef struct _doc_analysis {
     int camel_case;
 } DocFeatures;
 
-DocFeatures *analyze_doc(char *label, char *document);
+DocFeatures *extract_doc_features(char *label, char *document);
 void doc_analysis_free(DocFeatures *doc);
 
 #endif
