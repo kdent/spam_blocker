@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <doc_analysis.h>
+#include <doc_features.h>
 #include <str_list.h>
 
 void test_str(char *label, char *str);
@@ -31,7 +31,7 @@ main(int argc, char **argv)
 
 void
 test_str(char *label, char *str) {
-    struct doc_analysis *doc_f;
+    DocFeatures *doc_f;
 
     doc_f = extract_doc_features(label, str);
     if (doc_f == NULL) {
