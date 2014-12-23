@@ -1,5 +1,5 @@
-#ifndef DOC_ANALYSIS_H
-#define DOC_ANALYSIS_H
+#ifndef DOC_FEATURES_H
+#define DOC_FEATURES_H
 
 #include <str_list.h>
 #include <msg_content.h>
