@@ -17,16 +17,22 @@ main(int argc, char **argv)
     VocabList *vlist;
     DocList *dlist;
     int **vect, i, j;
+    str_list *words;
+    char *word;
 
     dlist = load_doc_list();
     vlist = vocab_list_from_docs(dlist);
 
-printf("no problem to here.\n");
     vect = vectorize_doc_list(vlist, dlist);
-printf("past vectorizing\n");
+
+    words = word_list(vlist);
+    for (word = str_list_first(words); word != NULL; word = str_list_next(words))
+    {
+        printf("%s\t", word);
+    }
+    puts("");
 
     for (i = 0; i < dlist->cur_size; i++) {
-printf("outer loop\n");
         for (j = 0; j < vlist->item_count; j++) {
             printf("%d\t", vect[i][j]);
         }
@@ -38,14 +44,15 @@ printf("outer loop\n");
 DocList *
 load_doc_list()
 {
-    DocFeatures *doc1;
-    DocFeatures *doc2;
+    DocFeatures *doc1, *doc2, *doc3;
     DocList *dlist;
 
     doc1 = read_file("test/data/msg01.txt");
     doc2 = read_file("test/data/msg02.txt");
+    doc3 = read_file("test/data/msg03.txt");
     dlist = doc_list_init();
     doc_list_add(dlist, doc1);
     doc_list_add(dlist, doc2);
+    doc_list_add(dlist, doc3);
     return dlist;
 }

@@ -25,22 +25,22 @@ spam_blocker: $(OBJS) $(DEPS) src/spam_blocker.c
 	$(CC) -o $@ $(CFLAGS) $(OBJS) src/$(@).c
 
 
-test_doc_list: $(OBJS) $(DEPS) test/test_doc_list.c
+test_doc_list: $(SRCS) $(OBJS) $(DEPS) test/test_doc_list.c
 	$(CC) -o $@ $(CFLAGS) $(OBJS) test/$(@).c
 
-test_doc_features: $(OBJS) $(DEPS) test/test_doc_features.c test/test_cases.o
+test_doc_features: $(SRCS) $(OBJS) $(DEPS) test/test_doc_features.c test/test_cases.o
 	$(CC) -o $@ $(CFLAGS) $(OBJS) test_cases.o test/$(@).c
 
-test_msg_content: $(OBJS) $(DEPS) test/test_msg_content.c
+test_msg_content: $(SRCS) $(OBJS) $(DEPS) test/test_msg_content.c
 	$(CC) -o $@ $(CFLAGS) $(OBJS) test/$(@).c
 
-test_vectorize: $(OBSJS) $(DEPS) test/test_vectorize.c test/test_cases.o
+test_vectorize: $(SRCS) $(OBSJS) $(DEPS) test/test_vectorize.c test_cases.o
 	$(CC) -o $@ $(CFLAGS) $(OBJS) test_cases.o test/$(@).c
 
-test_vocab_list: $(OBSJS) $(DEPS) test/test_vocab_list.c test/test_cases.o
+test_vocab_list: $(SRCS) $(OBSJS) $(DEPS) test/test_vocab_list.c test_cases.o
 	$(CC) -o $@ $(CFLAGS) $(OBJS) test_cases.o test/$(@).c
 
-test/test_cases.o: test/test_cases.c test/test_cases.h
+test_cases.o: test/test_cases.c test/test_cases.h
 	$(CC) -c $(?)
 
 clean:

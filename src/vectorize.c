@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include <doc_features.h>
 #include <doc_list.h>
@@ -20,14 +21,15 @@ vectorize_doc_list(VocabList *vlist, DocList *dlist)
     for (doc_features = doc_list_first(dlist); doc_features != NULL;
     doc_features = doc_list_next(dlist))
     {
-        v[doc_count] = (int *)calloc(dlist->cur_size, sizeof(int *));
+        v[doc_count] = (int *)malloc(vlist->item_count * sizeof(int));
+        memset(v[doc_count], 0, vlist->item_count);
         for (tok = str_list_first(doc_features->token_list); tok != NULL;
         tok = str_list_next(doc_features->token_list))
         {
-            v[doc_count] = (int *)calloc(vlist->item_count, sizeof(int));
             vocab_item = vocab_list_lookup(vlist, tok);
-            v[doc_count++][vocab_item->index] = 1;
+            v[doc_count][vocab_item->index] = 1;
         }
+        doc_count++;
     }
 
     return v;
