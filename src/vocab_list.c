@@ -10,6 +10,7 @@
 
 int vocab_list_init(VocabList *vlist);
 VocabItem *vocab_item_init(char *word, int cur_index);
+int vocab_item_index_cmp(const void *v1, const void *v2);
 
 /*
  * Initialize a new VocabList.
@@ -87,28 +88,72 @@ vocab_list_free(VocabList *vlist)
 }
 
 /*
- * Get the set of words for a given VocabList.
+ * Get the set of words in their index order for a given VocabList.
+ *
+ * If successful word_list() returns a str_list of the individual
+ * words in this collection. It returns NULL if there is a memory or
+ * other error.
  */
 str_list *
 word_list(VocabList *vlist)
 {
-    str_list *wlist;
-    int i;
+    VocabItem **new_list;
+    VocabItem *item;
+    str_list *word_list;
+    int i, j;
 
-    wlist = str_list_init();
-    if (wlist == NULL) return NULL;
+    word_list = str_list_init();
+    if (word_list == NULL) return NULL;
+    new_list = (VocabItem **)malloc(vlist->size * sizeof(VocabItem *));
+    if (new_list == NULL) return NULL;
 
+    /*
+     * Create a list of pointers to each VocabItem in vlist so it
+     * can be sorted.
+     */
+    j = 0;
     for (i = 0; i < vlist->tbl_size; i++) {
-        VocabItem *item = NULL;
         if ((item = vlist->table[i]) != NULL) {
             while (item != NULL) {
-                str_list_add(wlist, item->word);
+                new_list[j] = item;
                 item = item->next;
+                j++;
             }
         }
     }
 
-    return wlist;
+    /*
+     * Sort the VocabItems according to their index in the list.
+     */
+    qsort(new_list, vlist->size, sizeof(VocabItem *), vocab_item_index_cmp);
+
+    /*
+     * Build the str_list of words.
+     */
+    for (i = 0; i < vlist->size; i++) {
+        str_list_add(word_list, new_list[i]->word);
+    }
+
+    free(new_list);
+    return word_list;
+}
+
+int
+vocab_item_index_cmp(const void *voc1, const void *voc2)
+{
+    int r, val1, val2;
+
+    val1 = ((VocabItem *)voc1)->index;
+    val2 = ((VocabItem *)voc2)->index;
+
+    if (val1 < val2) {
+        r = -1;
+    } else if (val1 > val2) {
+        r = 1;
+    } else {
+        r = 0;
+    }
+    return r;
 }
 
 int

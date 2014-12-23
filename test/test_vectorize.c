@@ -18,6 +18,7 @@ main(int argc, char **argv)
     DocList *dlist;
     int **vect, i, j;
     str_list *words;
+    int first;
     char *word;
 
     dlist = load_doc_list();
@@ -26,15 +27,27 @@ main(int argc, char **argv)
     vect = vectorize_doc_list(vlist, dlist);
 
     words = word_list(vlist);
+    first = 1;
     for (word = str_list_first(words); word != NULL; word = str_list_next(words))
     {
-        printf("%s\t", word);
+        if (first) {
+            printf("%s", word);
+            first = 0;
+        } else {
+            printf(",%s", word);
+        }
     }
     puts("");
 
     for (i = 0; i < dlist->size; i++) {
+        first = 1;
         for (j = 0; j < vlist->size + 2; j++) {
-            printf("%d\t", vect[i][j]);
+            if (first) {
+                printf("%d", vect[i][j]);
+                first = 0;
+            } else {
+                printf(",%d", vect[i][j]);
+            }
         }
         puts("");
     }
