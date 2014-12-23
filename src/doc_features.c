@@ -48,11 +48,11 @@ struct token_buf {
 };
 
 /* Internal function prototypes */
-State    state_transition(DocFeatures *doc_features, struct token_buf *buf, Alphabet symbol, State cur_state, char c);
-int      push_char(struct token_buf *buf, char c);
-int      make_token(DocFeatures *doc_features, struct token_buf *buf);
-char     digit_to_char(char c);
-Alphabet get_symbol(DocFeatures *doc_features, State current_state, char c);
+static State state_transition(DocFeatures *doc_features, struct token_buf *buf, Alphabet symbol, State cur_state, char c);
+static int push_char(struct token_buf *buf, char c);
+static int make_token(DocFeatures *doc_features, struct token_buf *buf);
+static char digit_to_char(char c);
+static Alphabet get_symbol(char c, State current_state, DocFeatures *doc_features);
 
 /*
  *
@@ -89,7 +89,7 @@ extract_doc_features(char *label, char *doc)
     /* */
     for (i = 0; i < strlen(doc); i++) {
         c = doc[i];
-        current_symbol = get_symbol(doc_features, current_state, c);
+        current_symbol = get_symbol(c, current_state, doc_features);
         current_state = state_transition(doc_features, &buf, current_symbol, current_state, c);
         if (current_state == ERROR)
             return NULL;
@@ -108,7 +108,7 @@ doc_analysis_free(DocFeatures *doc)
     free(doc);
 }
 
-State
+static State
 state_transition(DocFeatures *doc_features, struct token_buf *buf,
 Alphabet symbol, State cur_state, char c)
 {
@@ -166,7 +166,7 @@ Alphabet symbol, State cur_state, char c)
     return next_state;
 }
 
-int
+static int
 push_char(struct token_buf *buf, char c)
 {
     if (buf->end_ptr < MSG_HDR_LEN) {
@@ -175,7 +175,7 @@ push_char(struct token_buf *buf, char c)
     return 0;
 }
 
-int
+static int
 make_token(DocFeatures *doc_features, struct token_buf *buf)
 {
     char *token = (char *)malloc(buf->end_ptr + 1);
@@ -191,7 +191,7 @@ make_token(DocFeatures *doc_features, struct token_buf *buf)
     return 0;
 }
 
-char
+static char
 digit_to_char(char c)
 {
     if (c == '0') {
@@ -202,8 +202,17 @@ digit_to_char(char c)
     return c;
 }
 
-Alphabet
-get_symbol(DocFeatures *doc_features, State current_state, char c)
+/*
+ * Converts an input character to a symbol in the Alphabet. How the character
+ * should be interpreted can depend on the current_state. Some of the extracted
+ * features of a document come from the underlying character before it is
+ * converted to a symbol (such as digits embedded in a word). The doc_features
+ * structure will be updated to include features extracted at this point.
+ *
+ * get_symbol() always returns an Alphabet symbol.
+ */
+static Alphabet
+get_symbol(char c, State current_state, DocFeatures *doc_features)
 {
     Alphabet cur_symbol;
 
