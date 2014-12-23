@@ -13,6 +13,7 @@
 
 #include <doc_list.h>
 #include <read_file.h>
+#include <vectorize.h>
 #include <vocab_list.h>
 
 #define PROGNAME "spam_blocker"
@@ -53,6 +54,9 @@ main(int argc, char **argv)
     /* Create a vocabulary list from all the words in the corpus. */
     vocab_list = vocab_list_from_docs(doc_features_list);
 
+    vectorize_doc_list(vocab_list, doc_features_list);
+
+/*
 {
 str_list *words;
 char *word;
@@ -65,6 +69,7 @@ for (word = str_list_first(words); word != NULL; word = str_list_next(words)) {
 
 str_list_free(words);
 }
+*/
 
     doc_list_free(doc_features_list);
     vocab_list_free(vocab_list);

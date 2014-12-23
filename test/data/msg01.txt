@@ -1,0 +1,36 @@
+MIME-Version: 1.0
+ 09 May 2011 11:30:50 -0700 (PDT)
+Date: Mon, 9 May 2011 15:30:50 -0300
+Message-ID: <BANLkTinWAXeu_QY-0wxgM04rVq27a20+Vw@mail.gmail.com>
+Subject: List of material found on the web
+From: Pedro Koblitz <pedrokoblitz@gmail.com>
+To: nltk-users@googlegroups.com
+
+---
+Videos
+nltk team @ google (probably most of you already wathed it)
+http://www.youtube.com/watch?v=keXW_5-llD0
+
+in the related videos, i found more stuff on bayes and nlp
+http://www.youtube.com/watch?v=ai1QZGuIC6A
+
+40 lectures on AI by the India Institute of Technology (the last two are
+about nlp)
+http://www.youtube.com/user/nptelhrd#g/c/E051420C2068DCB2
+
+---
+More links (self-updating delicious stream, some interesting stuff)
+http://www.delicious.com/tag/nltk
+
+Pedro Koblitz
+http://pedrokoblitz.com.br
+--
+21 2242-2187
+
+-- 
+You received this message because you are subscribed to the Google Groups "nltk-users" group.
+To post to this group, send email to nltk-users@googlegroups.com.
+To unsubscribe from this group, send email to nltk-users+unsubscribe@googlegroups.com.
+For more options, visit this group at http://groups.google.com/group/nltk-users?hl=en.
+
+
