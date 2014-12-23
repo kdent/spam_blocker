@@ -32,8 +32,8 @@ main(int argc, char **argv)
     }
     puts("");
 
-    for (i = 0; i < dlist->cur_size; i++) {
-        for (j = 0; j < vlist->item_count; j++) {
+    for (i = 0; i < dlist->size; i++) {
+        for (j = 0; j < vlist->size + 2; j++) {
             printf("%d\t", vect[i][j]);
         }
         puts("");
@@ -50,6 +50,7 @@ load_doc_list()
     doc1 = read_file("test/data/msg01.txt");
     doc2 = read_file("test/data/msg02.txt");
     doc3 = read_file("test/data/msg03.txt");
+    doc3->embedded_digit = 1;
     dlist = doc_list_init();
     doc_list_add(dlist, doc1);
     doc_list_add(dlist, doc2);

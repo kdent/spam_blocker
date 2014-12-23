@@ -86,7 +86,15 @@ extract_doc_features(char *label, char *doc)
     buf.end_ptr = 0;
     memset(buf.cur_token, 0, MSG_HDR_LEN);
 
-    /* */
+    /*
+     * Process document using a finite-state transducer. The transducer accepts
+     * the entire document as a string and outputs a list of tokens. The
+     * transducer additionally converts all characters to lower case, embedded
+     * digits to the letters they represent (e.g. "l0ve -> love"), and
+     * tokenizes camel-case words into separate tokens (e.g. MakeMoneyFast ->
+     * [make, money, fast]). The list of tokens and other features are stored
+     * in * the doc_features structure during processing.
+     */
     for (i = 0; i < strlen(doc); i++) {
         c = doc[i];
         current_symbol = get_symbol(c, current_state, doc_features);
@@ -94,6 +102,8 @@ extract_doc_features(char *label, char *doc)
         if (current_state == ERROR)
             return NULL;
     }
+
+    /* If processing finishes on a word, tokenize it. */
     if (current_state == LWORD || current_state == UWORD)
         make_token(doc_features, &buf);
 
