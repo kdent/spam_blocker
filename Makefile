@@ -34,6 +34,9 @@ test_doc_features: $(SRCS) $(OBJS) $(DEPS) test/test_doc_features.c test/test_ca
 test_msg_content: $(SRCS) $(OBJS) $(DEPS) test/test_msg_content.c
 	$(CC) -o $@ $(CFLAGS) $(OBJS) test/$(@).c
 
+test_read_file: $(SRCS) $(OBJS) $(DEPS) test/test_read_file.c
+	$(CC) -o $@ $(CFLAGS) $(OBJS) test/$(@).c
+
 test_vectorize: $(SRCS) $(OBSJS) $(DEPS) test/test_vectorize.c test_cases.o
 	$(CC) -o $@ $(CFLAGS) $(OBJS) test_cases.o test/$(@).c
 
