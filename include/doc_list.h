@@ -6,7 +6,7 @@
 #define DOC_LIST_SIZE 4
 
 typedef struct _doc_list {
-    int cur_size;
+    int size;
     int max_size;
     int cur_item;
     DocFeatures **list;

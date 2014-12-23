@@ -9,10 +9,9 @@ typedef struct _vocab_item {
 } VocabItem;
 
 typedef struct _vocab_list {
-    int tbl_size;
-    int slot_count;
-    int item_count;
-    VocabItem **table;
+    int tbl_size;       /* the size of the hash table */
+    int size;           /* the number of words in the table */
+    VocabItem **table;  /* the hash table */
 } VocabList;
 
 str_list *word_list(VocabList *);

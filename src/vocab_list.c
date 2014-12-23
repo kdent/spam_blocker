@@ -19,8 +19,7 @@ vocab_list_init(VocabList *vlist)
 {
     int i;
     vlist->tbl_size = TBLSIZE;
-    vlist->slot_count = 0;
-    vlist->item_count = 0;
+    vlist->size = 0;
     vlist->table = (VocabItem **)malloc(sizeof(VocabItem) * TBLSIZE);
     if (vlist->table == NULL) return -1;
     for (i = 0; i < vlist->tbl_size; i++) {
@@ -131,21 +130,20 @@ vocab_list_insert(VocabList *vlist, char *word)
         item = vocab_list_lookup(vlist, word);
         if (item == NULL) {     /* This word does not exist yet. */
             VocabItem *list_item = vlist->table[hash];
-            item = vocab_item_init(word, vlist->item_count);
+            item = vocab_item_init(word, vlist->size);
             if (item == NULL) return -1;
             /* Find the end of the chained list. */
             while (list_item->next != NULL) {
                 list_item = list_item->next;
             }
             list_item->next = item;
-            vlist->item_count++;
+            vlist->size++;
         } else {    /* Same as existing word, increment its count. */
             item->count++;
         }
     } else {    /* Slot is completely available. */
-        item = vocab_item_init(word, vlist->item_count);
-        vlist->item_count++;
-        vlist->slot_count++;
+        item = vocab_item_init(word, vlist->size);
+        vlist->size++;
         if (item == NULL) return -1;
         vlist->table[hash] = item;
     }

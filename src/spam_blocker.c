@@ -33,6 +33,7 @@ int
 main(int argc, char **argv)
 {
     char *dirname;
+    int **vector;
     DocList *doc_features_list = NULL;
     VocabList *vocab_list = NULL;
 
@@ -45,7 +46,7 @@ main(int argc, char **argv)
     /* Load the training files into a list of document features. */
     dirname = argv[1];
     doc_features_list = load_training_docs(dirname);
-    if (doc_features_list == NULL || doc_features_list->cur_size == 0) {
+    if (doc_features_list == NULL || doc_features_list->size == 0) {
         fprintf(stderr, "%s: no training files found or unable to read files in directory: %s\n",
             PROGNAME, dirname);
         exit(1);
@@ -54,7 +55,7 @@ main(int argc, char **argv)
     /* Create a vocabulary list from all the words in the corpus. */
     vocab_list = vocab_list_from_docs(doc_features_list);
 
-    vectorize_doc_list(vocab_list, doc_features_list);
+    vector = vectorize_doc_list(vocab_list, doc_features_list);
 
 /*
 {
@@ -71,6 +72,7 @@ str_list_free(words);
 }
 */
 
+    vector_free(vector, doc_features_list->size);
     doc_list_free(doc_features_list);
     vocab_list_free(vocab_list);
 

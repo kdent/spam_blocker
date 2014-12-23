@@ -14,7 +14,7 @@ doc_list_init()
     DocList *dlist = NULL;
     dlist = (DocList *)malloc(sizeof(DocList));
     dlist->max_size = DOC_LIST_SIZE;
-    dlist->cur_size = 0;
+    dlist->size = 0;
     dlist->cur_item = 0;
     dlist->list = (DocFeatures **)malloc(sizeof(DocFeatures *) * dlist->max_size);
     memset(dlist->list, 0, sizeof(DocFeatures *) * dlist->max_size);
@@ -57,7 +57,7 @@ int
 doc_list_add(DocList *dlist, DocFeatures *doc)
 {
 
-    if (dlist->cur_size >= dlist->max_size) {
+    if (dlist->size >= dlist->max_size) {
         DocFeatures **new_list = NULL;
         new_list = realloc(dlist->list, (sizeof(DocFeatures *) * dlist->max_size) * 2);
         if (new_list == NULL)
@@ -69,7 +69,7 @@ doc_list_add(DocList *dlist, DocFeatures *doc)
         dlist->list = new_list;
         dlist->max_size *= 2;
     }
-    dlist->list[dlist->cur_size++] = doc;
+    dlist->list[dlist->size++] = doc;
     return 0;
 }
 
@@ -83,7 +83,7 @@ doc_list_first(DocList *dlist)
 DocFeatures *
 doc_list_next(DocList *dlist)
 {
-    if (dlist->cur_item > dlist->cur_size)
+    if (dlist->cur_item > dlist->size)
         return NULL;
     else
         return dlist->list[dlist->cur_item++];
@@ -93,7 +93,7 @@ void
 doc_list_free(DocList *dlist)
 {
     int i;
-    for (i = 0; i < dlist->cur_size; i++) {
+    for (i = 0; i < dlist->size; i++) {
         doc_analysis_free(dlist->list[i]);
     }
     free(dlist->list);
