@@ -30,8 +30,8 @@ vectorize_doc_list(VocabList *vlist, DocList *dlist)
     if (v == NULL) return NULL;
 
     n_features = vlist->size + 2;  /* Two features in addition to the words. */
-    embedded_digit_col = n_features + 1;
-    camel_case_col = n_features + 2;
+    embedded_digit_col = vlist->size;
+    camel_case_col = vlist->size + 1;
 
     i = 0;
     for (doc_features = doc_list_first(dlist); doc_features != NULL;

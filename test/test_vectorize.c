@@ -38,6 +38,7 @@ main(int argc, char **argv)
             printf(",%s", word);
         }
     }
+    printf(",%s,%s", "EMBEDDED", "CAMEL_CASE");
     puts("");
 
     for (i = 0; i < dlist->size; i++) {
@@ -68,6 +69,7 @@ load_doc_list()
 
     doc1 = read_file("test/data/msg01.txt");
     doc2 = read_file("test/data/msg02.txt");
+    doc2->camel_case = 1;
     doc3 = read_file("test/data/msg03.txt");
     doc3->embedded_digit = 1;
     dlist = doc_list_init();
