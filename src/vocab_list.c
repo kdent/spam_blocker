@@ -104,7 +104,7 @@ word_list(VocabList *vlist)
 
     word_list = str_list_init();
     if (word_list == NULL) return NULL;
-    new_list = (VocabItem **)malloc(vlist->size * sizeof(VocabItem *));
+    new_list = (VocabItem **)calloc(vlist->size, sizeof(VocabItem *));
     if (new_list == NULL) return NULL;
 
     /*
@@ -143,8 +143,8 @@ vocab_item_index_cmp(const void *voc1, const void *voc2)
 {
     int r, val1, val2;
 
-    val1 = ((VocabItem *)voc1)->index;
-    val2 = ((VocabItem *)voc2)->index;
+    val1 = (*(VocabItem **)voc1)->index;
+    val2 = (*(VocabItem **)voc2)->index;
 
     if (val1 < val2) {
         r = -1;

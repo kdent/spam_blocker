@@ -28,7 +28,8 @@ main(int argc, char **argv)
 
     words = word_list(vlist);
     first = 1;
-    for (word = str_list_first(words); word != NULL; word = str_list_next(words))
+    for (word = str_list_first(words); word != NULL;
+    word = str_list_next(words))
     {
         if (first) {
             printf("%s", word);
@@ -51,6 +52,11 @@ main(int argc, char **argv)
         }
         puts("");
     }
+
+    vector_free(vect, dlist->size);
+    doc_list_free(dlist);
+    str_list_free(words);
+    vocab_list_free(vlist);
 
 }
 
