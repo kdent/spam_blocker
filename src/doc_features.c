@@ -10,7 +10,16 @@
 
 
 /*
- * Perform analysis on a documents's content.
+ * Perform analysis on a documents's content. A document is a string of words
+ * that have been extracted from an email message From: and Subject: header
+ * lines. First the code tokenizes the document string into a list of tokens 
+ * and determines features for the document. Features are stored in a struct
+ * that contains the following attributes:
+ *   char *label;               // readable name for the class spam or not spam
+ *   int class;                 // integer value representing the class
+ *   str_list *token_list;      // list of tokens from the document
+ *   int embedded_digit;        // flag set to 1 if tokens contain a digit in place of a letter
+ *   int camel_case;            // flag set to 1 if tokens use camel case instead of normal word spacing
  */
 
 /* Define state machine's alphabet and states. */
@@ -55,7 +64,6 @@ static char digit_to_char(char c);
 static Alphabet get_symbol(char c, State current_state, DocFeatures *doc_features);
 
 /*
- *
  * Returns a doc_features structure or NULL if there are memory errors.
  */
 DocFeatures *
