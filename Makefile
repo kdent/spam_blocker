@@ -24,6 +24,9 @@ CFLAGS = -g -Wall -std=c99 -pedantic -Iinclude
 spam_blocker: $(OBJS) $(DEPS) src/spam_blocker.c
 	$(CC) -o $@ $(CFLAGS) $(OBJS) src/$(@).c
 
+train: $(OBJS) $(DEPS) src/train.c
+	$(CC) -o $@ $(CFLAGS) $(OBJS) src/$(@).c
+
 
 test_doc_list: $(SRCS) $(OBJS) $(DEPS) test/test_doc_list.c
 	$(CC) -o $@ $(CFLAGS) $(OBJS) test/$(@).c
@@ -47,4 +50,4 @@ test_cases.o: test/test_cases.c test/test_cases.h
 	$(CC) -c $(?)
 
 clean:
-	rm -rf $(OBJS) spam_blocker src/spam_blocker.o test_* *.dSYM test/*.gch
+	rm -rf $(OBJS) train spam_blocker src/train.o src/spam_blocker.o test_* *.dSYM test/*.gch
