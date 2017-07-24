@@ -17,9 +17,11 @@
  *
  */
 
-
+#include <fcntl.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>
+#include <sys/stat.h>
 
 #include <doc_features.h>
 #include <doc_list.h>
@@ -69,12 +71,16 @@ main(int argc, char **argv)
     for (; vitem != NULL; vitem = vocab_list_next(vocab_list)) {
         printf("** %s:%d ** \n", vitem->word, vitem->count);
     }
-    printf("\n");
 
-    /* Print just the list of words. */
-    str_list *words = word_list(vocab_list);
-    for (char *w = str_list_first(words); w != NULL; w = str_list_next(words)) {
-        printf("%s\n", w);
+    int fd = open("vocab_list.dat", O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+    if (fd == -1) {
+        perror("train:");
+        exit(-1);
     }
+    write(fd, vocab_list, vocab_list_sizeof(vocab_list));
+    close(fd);
+
+
+    vocab_list_free(vocab_list);
 
 }

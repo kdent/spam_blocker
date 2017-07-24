@@ -22,6 +22,7 @@ str_list *word_list(VocabList *);
 void word_list_free(int, char **);
 VocabList *vocab_list_from_docs(DocList *doc_list);
 void vocab_list_free(VocabList *vlist);
+size_t vocab_list_sizeof(VocabList *vlist);
 int vocab_list_insert(VocabList *vlist, char *word);
 VocabItem *vocab_list_lookup(VocabList *vlist, char *word);
 int hash_vocab_word(const void *word);

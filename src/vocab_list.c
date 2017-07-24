@@ -119,6 +119,14 @@ vocab_list_free(VocabList *vlist)
     free(vlist);
 }
 
+size_t
+vocab_list_sizeof(VocabList *vlist)
+{
+    size_t sz = 110;
+
+    return sz;
+}
+
 /*
  * Get the set of words in their index order for a given VocabList.
  *
