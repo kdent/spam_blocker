@@ -1,3 +1,30 @@
+/**
+ * A VocabList maintains a set of VocabItem objects. You can initialize a new
+ * list with:
+ *
+ *    vocab_list_init(VocabList *vlist)
+ *
+ * to create an empty list, or you can initialize a list from a set of 
+ * documents with:
+ *
+ *   vocab_list_from_docs(DocList *doc_list)
+ *
+ * When you are finished with the list, you must free it with:
+ *
+ *   vocab_list_free(VocabList *vlist)
+ *
+ * You can add a new item to the list:
+ *
+ *   vocab_list_insert(VocabList *vlist, char *word)
+ *
+ * Get a simple list of the words in the list:
+ *
+ *    word_list(VocabList *vlist)
+ *
+ * Lookup a specific word from the list:
+ *
+ *    vocab_list_lookup(VocabList *vlist, char *word)
+ */
 #include <stdlib.h>
 #include <string.h>
 
@@ -6,35 +33,41 @@
 #include <str_list.h>
 #include <vocab_list.h>
 
-#define TBLSIZE 9323
-
-int vocab_list_init(VocabList *vlist);
 VocabItem *vocab_item_init(char *word, int cur_index);
+static VocabItem *next_vocab_item(VocabList *vlist, int cur_index);
 int vocab_item_index_cmp(const void *v1, const void *v2);
 
 /*
  * Initialize a new VocabList.
+ *
+ * Returns a pointer to a new VocabList or NULL on memory error.
  */
-int
-vocab_list_init(VocabList *vlist)
+VocabList *
+vocab_list_init()
 {
     int i;
+    VocabList *vlist = (VocabList *)malloc(sizeof(VocabList));
+    if (vlist == NULL)
+        return NULL;
+
     vlist->tbl_size = TBLSIZE;
     vlist->size = 0;
+
+    /* Initialize hash buckets. */
     vlist->table = (VocabItem **)malloc(sizeof(VocabItem) * TBLSIZE);
-    if (vlist->table == NULL) return -1;
+    if (vlist->table == NULL) return NULL;
     for (i = 0; i < vlist->tbl_size; i++) {
         vlist->table[i] = NULL;
     }
-    return 0;
+
+    return vlist;
 }
 
 /*
  * Create a new VocabList from a given DocList. A VocabList is a list of
- * VocabItem objects which is managed as a hash table for fast read access.
- *  In addition to the word other information such as number of occurences is
- * stored in the VocabItem. The returned VocabList should be freed by calling
- * vocab_list_free().
+ * VocabItem objects.  In addition to the word other information such as number
+ * of occurences is stored in the VocabItem. The returned VocabList should be
+ * freed by calling vocab_list_free().
  *
  * If successful, vocab_list_from_docs() returns a pointer to a VocabList. If
  * there is an error allocating memory or the doc_list parameter is NULL, it
@@ -49,9 +82,8 @@ vocab_list_from_docs(DocList *doc_list)
 
     if (doc_list == NULL) return NULL;
 
-    vlist = (VocabList *)malloc(sizeof(VocabList));
-    if (vlist == NULL) return NULL;
-    if (vocab_list_init(vlist) != 0) return NULL;
+    if ((vlist = vocab_list_init()) == NULL)
+        return NULL;
 
     for (doc = doc_list_first(doc_list); doc != NULL; doc = doc_list_next(doc_list))
     {
@@ -136,6 +168,32 @@ word_list(VocabList *vlist)
 
     free(new_list);
     return word_list;
+}
+
+VocabItem *
+vocab_list_first(VocabList *vlist)
+{
+    return next_vocab_item(vlist, 0);
+}
+
+VocabItem *
+vocab_list_next(VocabList *vlist)
+{
+    return next_vocab_item(vlist, vlist->cur_item);
+}
+
+static VocabItem *
+next_vocab_item(VocabList *vlist, int cur_index)
+{
+    VocabItem *voc = NULL;
+    int i = cur_index;
+    for (i = cur_index; i <= TBLSIZE; i++) {
+        voc = vlist->table[i];
+        if (voc != NULL)
+            break;
+    }
+    vlist->cur_item = ++i;
+    return voc;
 }
 
 int
