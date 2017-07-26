@@ -33,7 +33,6 @@
 #include <str_list.h>
 #include <vocab_list.h>
 
-VocabItem *vocab_item_init(char *word, int cur_index);
 static VocabItem *next_vocab_item(VocabList *vlist, int cur_index);
 int vocab_item_index_cmp(const void *v1, const void *v2);
 
@@ -50,11 +49,11 @@ vocab_list_init()
         return NULL;
     memset(vlist, 0, sizeof(VocabList));
 
-    vlist->tbl_size = TBLSIZE;
+    vlist->tbl_size = VOCAB_ITEM_TBL_SIZE;
     vlist->size = 0;
 
     /* Initialize hash buckets. */
-    vlist->table = (VocabItem **)calloc(sizeof(VocabItem), TBLSIZE);
+    vlist->table = (VocabItem **)calloc(sizeof(VocabItem), VOCAB_ITEM_TBL_SIZE);
     if (vlist->table == NULL) return NULL;
 
     return vlist;
@@ -192,7 +191,7 @@ next_vocab_item(VocabList *vlist, int cur_index)
 {
     VocabItem *voc = NULL;
     int i = cur_index;
-    for (i = cur_index; i <= TBLSIZE; i++) {
+    for (i = cur_index; i <= VOCAB_ITEM_TBL_SIZE; i++) {
         voc = vlist->table[i];
         if (voc != NULL)
             break;
@@ -225,7 +224,7 @@ vocab_list_insert(VocabList *vlist, char *word)
     VocabItem *item = NULL;
     int hash;
 
-    hash = hash_vocab_word(word);
+    hash = vocab_item_hash(word);
     item = vlist->table[hash];
 
     /*
@@ -259,26 +258,6 @@ vocab_list_insert(VocabList *vlist, char *word)
     return 0;
 }
 
-/*
- * Create a new VocabItem structure initializing default values and copying
- * the supplied word into the structure.
- */
-VocabItem *
-vocab_item_init(char *word, int cur_index)
-{
-    VocabItem *item = (VocabItem *)malloc(sizeof(VocabItem));
-    if (item == NULL) return NULL;
-    if (word != NULL) {
-        item->word = (char *)malloc(strlen(word) + 1);
-        if (item->word == NULL) return NULL;
-        strcpy(item->word, word);
-    }
-    item->count = 1;
-    item->index = cur_index;
-    item->next = NULL;
-    return item;
-}
-
 VocabItem *
 vocab_list_lookup(VocabList *vlist, char *word)
 {
@@ -288,7 +267,7 @@ vocab_list_lookup(VocabList *vlist, char *word)
     if (vlist == NULL) return NULL;
     if (word == NULL) return NULL;
 
-    hash = hash_vocab_word(word);
+    hash = vocab_item_hash(word);
     item = vlist->table[hash];
     if (item != NULL) {
         do {
@@ -300,28 +279,5 @@ vocab_list_lookup(VocabList *vlist, char *word)
         } while (item != NULL);
     }
     return item;
-}
-
-int
-hash_vocab_word(const void *word)
-{
-
-    const char *ptr;
-    int val;
-
-    val = 0;
-    ptr = word;
-    while (*ptr != '\0') {
-        int tmp;
-        val = (val << 4) + (*ptr);
-        if ((tmp = (val & 0xf0000000))) {
-            val = val ^ (tmp >> 24);
-            val = val ^ tmp;
-        }
-        ptr++;
-    }
-
-    return abs(val) % TBLSIZE;
-
 }
 

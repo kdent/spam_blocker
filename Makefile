@@ -1,22 +1,22 @@
 CC = cc
 OBJS = src/doc_features.o \
        src/doc_list.o \
-       src/hash_tbl.o \
+       src/hashtbl.o \
        src/list.o \
        src/msg_content.o \
        src/read_file.o \
        src/str_list.o \
        src/vectorize.o \
-       src/vocab_list.o
+       src/vocab_item.o
 DEPS = include/doc_features.h \
        include/doc_list.h \
-       include/hash_tbl.h \
+       include/hashtbl.h \
        include/list.h \
        include/msg_content.h \
        include/read_file.h \
        include/str_list.h \
        include/vectorize.h \
-       include/vocab_list.h
+       include/vocab_item.h
 
 SRCS = $(OBJS:.o=.c)
 

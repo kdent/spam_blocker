@@ -6,6 +6,7 @@
 #include <doc_list.h>
 #include <str_list.h>
 #include <vectorize.h>
+#include <vocab_item.h>
 #include <vocab_list.h>
 
 /*
@@ -46,8 +47,8 @@ vectorize_doc_list(VocabList *vlist, DocList *dlist)
         for (tok = str_list_first(doc_features->token_list); tok != NULL;
         tok = str_list_next(doc_features->token_list))
         {
-            vocab_item = vocab_list_lookup(vlist, tok);
-            v[i][vocab_item->index] = 1;
+//            vocab_item = vocab_list_lookup(vlist, tok);
+//            v[i][vocab_item->index] = 1;
         }
 
         /* Assign extra features if they exist. */

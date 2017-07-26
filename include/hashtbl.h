@@ -1,15 +1,15 @@
 /*****************************************************************************
 *                                                                            *
-*  ------------------------------- chtbl.h --------------------------------  *
+*  ------------------------------- hashtbl.h --------------------------------  *
 *                                                                            *
 *****************************************************************************/
 
-#ifndef CHTBL_H
-#define CHTBL_H
+#ifndef HASHTBL_H
+#define HASHTBL_H
 
 #include <stdlib.h>
 
-//#include "list.h"
+#include "list.h"
 
 /*****************************************************************************
 *                                                                            *
@@ -17,7 +17,7 @@
 *                                                                            *
 *****************************************************************************/
 
-typedef struct CHTbl_ {
+typedef struct HASHTbl_ {
 
 int                buckets;
 
@@ -28,7 +28,7 @@ void               (*destroy)(void *data);
 int                size;
 List               *table;
 
-} CHTbl;
+} HASHTbl;
 
 /*****************************************************************************
 *                                                                            *
@@ -36,17 +36,17 @@ List               *table;
 *                                                                            *
 *****************************************************************************/
 
-int chtbl_init(CHTbl *htbl, int buckets, int (*h)(const void *key), int
+int hashtbl_init(HASHTbl *htbl, int buckets, int (*h)(const void *key), int
    (*match)(const void *key1, const void *key2), void (*destroy)(void *data));
 
-void chtbl_destroy(CHTbl *htbl);
+void hashtbl_destroy(HASHTbl *htbl);
 
-int chtbl_insert(CHTbl *htbl, const void *data);
+int hashtbl_insert(HASHTbl *htbl, const void *data);
 
-int chtbl_remove(CHTbl *htbl, void **data);
+int hashtbl_remove(HASHTbl *htbl, void **data);
 
-int chtbl_lookup(const CHTbl *htbl, void **data);
+int hashtbl_lookup(const HASHTbl *htbl, void **data);
 
-#define chtbl_size(htbl) ((htbl)->size)
+#define hashtbl_size(htbl) ((htbl)->size)
 
 #endif

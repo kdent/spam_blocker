@@ -1,14 +1,7 @@
 #ifndef MAKE_VOCAB_LIST_H
 #define MAKE_VOCAB_LIST_H
 
-#define TBLSIZE 9323
-
-typedef struct _vocab_item {
-    char *word;         /* the word */
-    int count;          /* the number of times it occurs */
-    int index;          /* this word's index in the list */
-    struct _vocab_item *next;
-} VocabItem;
+#include <vocab_item.h>
 
 typedef struct _vocab_list {
     int tbl_size;       /* the size of the hash table */

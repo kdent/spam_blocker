@@ -25,9 +25,10 @@
 
 #include <doc_features.h>
 #include <doc_list.h>
+#include <hashtbl.h>
 #include <read_file.h>
 #include <str_list.h>
-#include <vocab_list.h>
+#include <vocab_item.h>
 
 int
 main(int argc, char **argv)
@@ -41,10 +42,11 @@ main(int argc, char **argv)
     int i;
     char *tok;
     DocFeatures *doc_features;
-    VocabList *vocab_list = vocab_list_init();
+    HASHTbl *vocab_list = (HASHTbl *)malloc(sizeof(HASHTbl));
 
-    if (vocab_list == NULL) {
-        fprintf(stderr, "memory error creating vocabulary list\n");
+    if (hashtbl_init(vocab_list, VOCAB_ITEM_TBL_SIZE, vocab_item_hash,
+                vocab_item_match, vocab_item_free) != 0) {
+        fprintf(stderr, "error initializing vocabulary list\n");
         exit(-1);
     }
 
@@ -58,31 +60,35 @@ main(int argc, char **argv)
         }
 
         /* Add each token to the overall vocabulary list. */
+        int j = 0;
         for (tok = str_list_first(doc_features->token_list);
              tok != NULL;
              tok = str_list_next(doc_features->token_list))
         {
-            vocab_list_insert(vocab_list, tok);
+            VocabItem *vocab_item = vocab_item_init(tok, ++j);
+            hashtbl_insert(vocab_list, vocab_item);
         }
 
         doc_analysis_free(doc_features);
     }
 
     /* Go through the list of all the vocab items. */
+/*
     VocabItem *vitem = vocab_list_first(vocab_list);
     for (; vitem != NULL; vitem = vocab_list_next(vocab_list)) {
         printf("** %s:%d ** \n", vitem->word, vitem->count);
     }
+*/
 
     int fd = open("vocab_list.dat", O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
     if (fd == -1) {
         perror("train: can't open vocab_list.dat");
         exit(-1);
     }
-    write(fd, vocab_list, vocab_list_sizeof(vocab_list));
+    write(fd, vocab_list, hashtbl_size(vocab_list));
     close(fd);
 
 
-    vocab_list_free(vocab_list);
+    hashtbl_destroy(vocab_list);
 
 }
