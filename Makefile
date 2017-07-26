@@ -1,6 +1,8 @@
 CC = cc
 OBJS = src/doc_features.o \
        src/doc_list.o \
+       src/hash_tbl.o \
+       src/list.o \
        src/msg_content.o \
        src/read_file.o \
        src/str_list.o \
@@ -8,6 +10,8 @@ OBJS = src/doc_features.o \
        src/vocab_list.o
 DEPS = include/doc_features.h \
        include/doc_list.h \
+       include/hash_tbl.h \
+       include/list.h \
        include/msg_content.h \
        include/read_file.h \
        include/str_list.h \

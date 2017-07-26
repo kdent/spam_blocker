@@ -44,7 +44,7 @@ main(int argc, char **argv)
     VocabList *vocab_list = vocab_list_init();
 
     if (vocab_list == NULL) {
-        fprintf(stderr, "memory error creating vocabular list\n");
+        fprintf(stderr, "memory error creating vocabulary list\n");
         exit(-1);
     }
 
@@ -64,6 +64,8 @@ main(int argc, char **argv)
         {
             vocab_list_insert(vocab_list, tok);
         }
+
+        doc_analysis_free(doc_features);
     }
 
     /* Go through the list of all the vocab items. */
@@ -74,7 +76,7 @@ main(int argc, char **argv)
 
     int fd = open("vocab_list.dat", O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
     if (fd == -1) {
-        perror("train:");
+        perror("train: can't open vocab_list.dat");
         exit(-1);
     }
     write(fd, vocab_list, vocab_list_sizeof(vocab_list));

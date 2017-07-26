@@ -1,2 +1,4 @@
 *.o
 *.dSYM
+*.swp
+vocab_list.dat

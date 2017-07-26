@@ -25,6 +25,7 @@ msg_content(FILE *in_stream)
     int from_set = 0, subj_set = 0;
 
     line = (char *)malloc(MSG_HDR_LEN);
+    memset(line, 0, MSG_HDR_LEN);
 
     while (fgets(line, MSG_HDR_LEN, in_stream) != NULL) {
 
@@ -100,7 +101,7 @@ void
 chomp(char *str)
 {
     int i;
-    for (i = strlen(str) - 1; i > 0; i++) {
+    for (i = strlen(str) - 1; i > 0; i--) {
         if (str[i] == '\n' || str[i] == '\r')
             str[i] = '\0';
         else

@@ -45,20 +45,17 @@ int vocab_item_index_cmp(const void *v1, const void *v2);
 VocabList *
 vocab_list_init()
 {
-    int i;
     VocabList *vlist = (VocabList *)malloc(sizeof(VocabList));
     if (vlist == NULL)
         return NULL;
+    memset(vlist, 0, sizeof(VocabList));
 
     vlist->tbl_size = TBLSIZE;
     vlist->size = 0;
 
     /* Initialize hash buckets. */
-    vlist->table = (VocabItem **)malloc(sizeof(VocabItem) * TBLSIZE);
+    vlist->table = (VocabItem **)calloc(sizeof(VocabItem), TBLSIZE);
     if (vlist->table == NULL) return NULL;
-    for (i = 0; i < vlist->tbl_size; i++) {
-        vlist->table[i] = NULL;
-    }
 
     return vlist;
 }
