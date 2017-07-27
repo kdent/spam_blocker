@@ -39,7 +39,6 @@ main(int argc, char **argv)
         exit(1);
     }
 
-    int i;
     char *tok;
     DocFeatures *doc_features;
     HASHTbl *vocab_list = (HASHTbl *)malloc(sizeof(HASHTbl));
@@ -51,7 +50,7 @@ main(int argc, char **argv)
     }
 
     /* For each specificed document, extract its features. */
-    for (i = 1; i < argc; i++) {
+    for (int j = 1, i = 1; i < argc; i++) {
 
         doc_features = read_file(argv[i]);
         if (doc_features == NULL) {
@@ -60,25 +59,37 @@ main(int argc, char **argv)
         }
 
         /* Add each token to the overall vocabulary list. */
-        int j = 0;
         for (tok = str_list_first(doc_features->token_list);
              tok != NULL;
              tok = str_list_next(doc_features->token_list))
         {
-            VocabItem *vocab_item = vocab_item_init(tok, ++j);
-            hashtbl_insert(vocab_list, vocab_item);
+            VocabItem *vocab_item = vocab_item_init(tok, j);
+            VocabItem *new_item = vocab_item;
+            if (hashtbl_lookup(vocab_list, (void **)&vocab_item) == 0) {
+                /* If the lookup succeeds, vocab_item points to the original
+                 * item from the list. The new_item pointer will still point
+                 * to the newly created one. */
+                vocab_item->count++;
+                vocab_item_free(new_item);
+            } else {
+                int rc = hashtbl_insert(vocab_list, vocab_item);
+                j++;
+                if (rc != 0) {
+                    fprintf(stderr, "error adding %s to vocabulary hash table.\n", tok);
+                }
+            }
         }
 
         doc_analysis_free(doc_features);
     }
 
     /* Go through the list of all the vocab items. */
-/*
-    VocabItem *vitem = vocab_list_first(vocab_list);
-    for (; vitem != NULL; vitem = vocab_list_next(vocab_list)) {
-        printf("** %s:%d ** \n", vitem->word, vitem->count);
+    for (int i = 0; i < VOCAB_ITEM_TBL_SIZE; i++) {
+        for (ListElmt *list_item = list_head(&vocab_list->table[i]); list_item != NULL; list_item = list_next(list_item)) {
+            VocabItem *vocab_item = list_data(list_item);
+            printf("%d: %s (%d)\n", vocab_item->index, vocab_item->word, vocab_item->count);
+        }
     }
-*/
 
     int fd = open("vocab_list.dat", O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
     if (fd == -1) {
@@ -88,7 +99,7 @@ main(int argc, char **argv)
     write(fd, vocab_list, hashtbl_size(vocab_list));
     close(fd);
 
-
     hashtbl_destroy(vocab_list);
+    free(vocab_list);
 
 }

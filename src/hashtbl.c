@@ -58,7 +58,10 @@ void hashtbl_destroy(HASHTbl *htbl) {
 }
 
 /*
- * Insert an item into the hash table.
+ * Insert an item into the hash table. If the item is already in the table, 
+ * no change is made.
+ *
+ * return 0 on success, 1 if the item is already in the table, and -1 otherwise
  */
 int hashtbl_insert(HASHTbl *htbl, const void *data) {
 

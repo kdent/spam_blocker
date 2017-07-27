@@ -1,9 +1,3 @@
-/*****************************************************************************
-*                                                                            *
-*  ------------------------------- hashtbl.h --------------------------------  *
-*                                                                            *
-*****************************************************************************/
-
 #ifndef HASHTBL_H
 #define HASHTBL_H
 
@@ -11,31 +5,21 @@
 
 #include "list.h"
 
-/*****************************************************************************
-*                                                                            *
-*  Define a structure for chained hash tables.                               *
-*                                                                            *
-*****************************************************************************/
-
+/* Define a structure for chained hash tables. */
 typedef struct HASHTbl_ {
 
-int                buckets;
+    int buckets;
 
-int                (*h)(const void *key);
-int                (*match)(const void *key1, const void *key2);
-void               (*destroy)(void *data);
+    int (*h)(const void *key);
+    int (*match)(const void *key1, const void *key2);
+    void (*destroy)(void *data);
 
-int                size;
-List               *table;
+    int size;
+    List *table;
 
 } HASHTbl;
 
-/*****************************************************************************
-*                                                                            *
-*  --------------------------- Public Interface ---------------------------  *
-*                                                                            *
-*****************************************************************************/
-
+/* Define prototypes for functions. */
 int hashtbl_init(HASHTbl *htbl, int buckets, int (*h)(const void *key), int
    (*match)(const void *key1, const void *key2), void (*destroy)(void *data));
 

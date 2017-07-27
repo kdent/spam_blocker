@@ -29,9 +29,11 @@ vocab_item_init(char *word, int cur_index)
  * Determine if two VocabItem structures are the same word.
  */
 int
-vocab_item_match(const void *v1, const void *v2)
+vocab_item_match(const void *p1, const void *p2)
 {
-    return strncmp(((VocabItem *)v1)->word, ((VocabItem *)v2)->word, strlen(((VocabItem *)v1)->word));
+    VocabItem *v1 = (VocabItem *)p1;
+    VocabItem *v2 = (VocabItem *)p2;
+    return ! strncmp(v1->word, v2->word, strlen(v1->word));
 }
 
 /*
@@ -40,7 +42,6 @@ vocab_item_match(const void *v1, const void *v2)
 int
 vocab_item_hash(const void *v)
 {
-
     const char *ptr;
     int val;
 
